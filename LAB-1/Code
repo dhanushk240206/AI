@@ -1,0 +1,242 @@
+import random
+
+grid = []
+line = []
+for i in range(3):
+    for j in range(3):
+        line.append(" ")
+    grid.append(line)
+    line = []
+
+# grid printing
+def print_grid():
+    for i in range(3):
+        print("|", end="")
+        for j in range(3):
+            print(grid[i][j], "|", end="")
+        print("")
+
+# player turn
+def player_turn(turn_player1):
+    if turn_player1 == True:
+        turn_player1 = False
+        print(f"It's {player2}'s turn")
+    else:
+        turn_player1 = True
+        print(f"It's {player1}'s turn")
+    return turn_player1
+
+# choosing cell
+def write_cell(cell, turn_player1):
+    cell -= 1
+    i = int(cell / 3)
+    j = cell % 3
+    if turn_player1 == True:
+        grid[i][j] = player1_symbol
+    else:
+        grid[i][j] = player2_symbol
+    return grid
+
+# checking if cell is free
+def free_cell(cell):
+    cell -= 1
+    i = int(cell / 3)
+    j = cell % 3
+    if grid[i][j] == player1_symbol or grid[i][j] == player2_symbol:
+        print("This cell is not free")
+        return False
+    return True
+
+# system turn (AI)
+def system_turn():
+    empty_cells = [i for i in range(1, 10) if free_cell(i)]
+    if empty_cells:
+        return random.choice(empty_cells)
+    return None
+
+# win check
+def win_check(grid, player1_symbol, player2_symbol):
+    full_grid = True
+    player1_symbol_count = 0
+    player2_symbol_count = 0
+    # checking rows
+    for i in range(3):
+        for j in range(3):
+            if grid[i][j] == player1_symbol:
+                player1_symbol_count += 1
+                player2_symbol_count = 0
+                if player1_symbol_count == 3:
+                    game = False
+                    winner = player1
+                    return game, winner
+            if grid[i][j] == player2_symbol:
+                player2_symbol_count += 1
+                player1_symbol_count = 0
+                if player2_symbol_count == 3:
+                    game = False
+                    winner = player2
+                    return game, winner
+            if grid[i][j] == " ":
+                full_grid = False
+
+        player1_symbol_count = 0
+        player2_symbol_count = 0
+    # checking columns
+    player1_symbol_count = 0
+    player2_symbol_count = 0
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                if i + k <= 2:
+                    if grid[i + k][j] == player1_symbol:
+                        player1_symbol_count += 1
+                        player2_symbol_count = 0
+                        if player1_symbol_count == 3:
+                            game = False
+                            winner = player1
+                            return game, winner
+                    if grid[i + k][j] == player2_symbol:
+                        player2_symbol_count += 1
+                        player1_symbol_count = 0
+                        if player2_symbol_count == 3:
+                            game = False
+                            winner = player2
+                            return game, winner
+            if grid[i][j] == " ":
+                full_grid = False
+
+            player1_symbol_count = 0
+            player2_symbol_count = 0
+    # checking diagonals
+    player1_symbol_count = 0
+    player2_symbol_count = 0
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                if j + k <= 2 and i + k <= 2:
+                    if grid[i + k][j + k] == player1_symbol:
+                        player1_symbol_count += 1
+                        player2_symbol_count = 0
+                        if player1_symbol_count == 3:
+                            game = False
+                            winner = player1
+                            return game, winner
+                    if grid[i + k][j + k] == player2_symbol:
+                        player2_symbol_count += 1
+                        player1_symbol_count = 0
+                        if player2_symbol_count == 3:
+                            game = False
+                            winner = player2
+                            return game, winner
+            if grid[i][j] == " ":
+                full_grid = False
+
+            player1_symbol_count = 0
+            player2_symbol_count = 0
+
+    player1_symbol_count = 0
+    player2_symbol_count = 0
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                if j - k >= 0 and i + k <= 2:
+                    if grid[i + k][j - k] == player1_symbol:
+                        player1_symbol_count += 1
+                        player2_symbol_count = 0
+                        if player1_symbol_count == 3:
+                            game = False
+                            winner = player1
+                            return game, winner
+                    if grid[i + k][j - k] == player2_symbol:
+                        player2_symbol_count += 1
+                        player1_symbol_count = 0
+                        if player2_symbol_count == 3:
+                            game = False
+                            winner = player2
+                            return game, winner
+            if grid[i][j] == " ":
+                full_grid = False
+
+            player1_symbol_count = 0
+            player2_symbol_count = 0
+
+    # full grid or not
+    if full_grid == True:
+        game = False
+        winner = ""
+        return game, winner
+    else:
+        game = True
+        winner = ""
+        return game, winner
+
+# game mode selection
+def game_mode_selection():
+    print("Choose the game mode:")
+    print("1. User vs User")
+    print("2. User vs System")
+    choice = input("Enter 1 or 2: ")
+    if choice == "1":
+        return "User vs User"
+    elif choice == "2":
+        return "User vs System"
+    else:
+        print("Invalid choice! Please enter 1 or 2.")
+        return game_mode_selection()
+
+# game opening
+print("Welcome to Tic-Tac-Toe!")
+mode = game_mode_selection()
+print("")
+
+# input player names and symbols
+player1 = input("Please enter name of player 1: ")
+player1_symbol = input(f"Please enter the symbol for {player1}: ")
+
+if mode == "User vs User":
+    player2 = input("Please enter name of player 2: ")
+    player2_symbol = input(f"Please enter the symbol for {player2}: ")
+else:
+    player2 = "System"
+    player2_symbol = "O" if player1_symbol == "X" else "X"  # Automatically set to the opposite symbol of player 1
+
+game = True
+full_grid = False
+turn_player1 = True
+winner = ""
+
+# game loop
+while game:
+    turn_player1 = player_turn(turn_player1)
+    free_box = False
+    while free_box == False:
+        if turn_player1:  # Player 1's turn
+            cell = int(input(f"{player1}, enter a number (1 to 9): "))
+        else:
+            if mode == "User vs System":  # System's turn
+                print(f"{player2}'s turn (System)")
+                cell = system_turn()
+                print(f"System chose cell {cell}")
+            else:  # Player 2's turn (User vs User)
+                cell = int(input(f"{player2}, enter a number (1 to 9): "))
+
+        free_box = free_cell(cell)
+    grid = write_cell(cell, turn_player1)
+    print_grid()
+
+    game, winner = win_check(grid, player1_symbol, player2_symbol)
+
+# end of game
+if winner == player1:
+    print(f"Winner is {player1}!")
+elif winner == player2:
+    print(f"Winner is {player2}!")
+else:
+    print("It's a draw!")
+    
+    
+    
+    
+    
+    
+    
