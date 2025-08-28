@@ -1,0 +1,53 @@
+# Helper function: Check if all rooms are clean
+def all_rooms_clean(environment):
+    return all(status == "clean" for status in environment.values())
+
+# Helper function: Clean a specific room
+def clean_room(environment, room):
+    print(f"Cleaning {room}")
+    environment[room] = "clean"
+
+# Helper function: Move to next room in the 2x2 grid
+def move_to_next_room(current_room):
+    # Predefined cyclic movement order
+    if current_room == "room1":
+        return "room2"
+    elif current_room == "room2":
+        return "room4"
+    elif current_room == "room4":
+        return "room3"
+    elif current_room == "room3":
+        return "room1"
+
+# Vacuum cleaner agent function
+def vacuum_cleaner_agent(environment):
+    current_room = "room1"
+    steps = 0
+
+    print("Initial environment:", environment)
+    print(f"Starting cleaning in {current_room}\n")
+
+    while not all_rooms_clean(environment):
+        if environment[current_room] == "dirty":
+            clean_room(environment, current_room)
+        else:
+            print(f"{current_room} is already clean, moving on.")
+        
+        current_room = move_to_next_room(current_room)
+        steps += 1
+        print(f"Moved to {current_room}\n")
+
+    print("All rooms cleaned!")
+    print("Final environment:", environment)
+    print(f"Total steps taken: {steps}")
+
+# Initialize environment with all rooms dirty
+environment = {
+    "room1": "dirty",
+    "room2": "dirty",
+    "room3": "dirty",
+    "room4": "dirty"
+}
+
+# Run the agent
+vacuum_cleaner_agent(environment)
