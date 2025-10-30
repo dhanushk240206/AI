@@ -1,0 +1,121 @@
+import math
+
+# Initialize the board
+board = [" " for _ in range(9)]  # positions 0–8
+
+# Display the board
+def print_board():
+    print()
+    for i in range(3):
+        row = "|".join(board[i*3:(i+1)*3])
+        print(" " + row)
+        if i < 2:
+            print("-------")
+    print()
+
+# Check winner
+def is_winner(brd, player):
+    win_positions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # columns
+        [0, 4, 8], [2, 4, 6]              # diagonals
+    ]
+    return any(all(brd[pos] == player for pos in line) for line in win_positions)
+
+# Check for full board
+def is_full(brd):
+    return all(cell != " " for cell in brd)
+
+# --- Minimax with Alpha-Beta Pruning ---
+def minimax(brd, depth, alpha, beta, is_maximizing):
+    # Terminal states
+    if is_winner(brd, "O"):
+        return 1
+    elif is_winner(brd, "X"):
+        return -1
+    elif is_full(brd):
+        return 0
+
+    if is_maximizing:
+        max_eval = -math.inf
+        for i in range(9):
+            if brd[i] == " ":
+                brd[i] = "O"
+                eval = minimax(brd, depth + 1, alpha, beta, False)
+                brd[i] = " "
+                max_eval = max(max_eval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break  # Beta cut-off
+        return max_eval
+    else:
+        min_eval = math.inf
+        for i in range(9):
+            if brd[i] == " ":
+                brd[i] = "X"
+                eval = minimax(brd, depth + 1, alpha, beta, True)
+                brd[i] = " "
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break  # Alpha cut-off
+        return min_eval
+
+# AI chooses the best move
+def best_move():
+    best_score = -math.inf
+    move = None
+    for i in range(9):
+        if board[i] == " ":
+            board[i] = "O"
+            score = minimax(board, 0, -math.inf, math.inf, False)
+            board[i] = " "
+            if score > best_score:
+                best_score = score
+                move = i
+    return move
+
+# --- Main Game Loop ---
+def play_game():
+    print("Welcome to Tic Tac Toe (You = X, AI = O)")
+    print("AI uses Minimax with Alpha-Beta Pruning 🤖")
+    print_board()
+
+    while True:
+        # Human move
+        while True:
+            try:
+                move = int(input("Enter your move (1-9): ")) - 1
+                if 0 <= move <= 8 and board[move] == " ":
+                    board[move] = "X"
+                    break
+                else:
+                    print("Invalid move, try again.")
+            except ValueError:
+                print("Please enter a number between 1 and 9.")
+
+        print_board()
+
+        if is_winner(board, "X"):
+            print("🎉 You win! (Well played!)")
+            break
+        if is_full(board):
+            print("😐 It's a draw!")
+            break
+
+        # AI move
+        print("AI is thinking...")
+        ai = best_move()
+        board[ai] = "O"
+        print_board()
+
+        if is_winner(board, "O"):
+            print("💻 AI wins!")
+            break
+        if is_full(board):
+            print("😐 It's a draw!")
+            break
+
+# Run the game
+if __name__ == "__main__":
+    play_game()
